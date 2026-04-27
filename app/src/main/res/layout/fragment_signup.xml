@@ -17,7 +17,7 @@
             android:layout_marginTop="147dp"
             android:layout_marginBottom="147dp"
             android:ems="10"
-            android:hint="Username:"
+            android:hint="Email:"
             android:inputType="textEmailAddress"
             app:layout_constraintBottom_toBottomOf="@+id/etPasswordSignup"
             app:layout_constraintEnd_toEndOf="parent"
