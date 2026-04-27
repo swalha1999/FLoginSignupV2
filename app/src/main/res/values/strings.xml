@@ -1,5 +1,23 @@
 <resources>
     <string name="app_name">FLoginSignup</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="login_title">Welcome back</string>
+    <string name="login_subtitle">Sign in to continue</string>
+    <string name="signup_title">Create account</string>
+    <string name="signup_subtitle">Get started in seconds</string>
+    <string name="forgot_title">Reset password</string>
+    <string name="forgot_subtitle">We\'ll email you a reset link</string>
+
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+
+    <string name="login_button">Log in</string>
+    <string name="signup_button">Sign up</string>
+    <string name="reset_button">Send reset link</string>
+
+    <string name="forgot_link">Forgot password?</string>
+    <string name="no_account_prompt">Don\'t have an account?</string>
+    <string name="signup_link">Sign up</string>
+    <string name="have_account_prompt">Already have an account?</string>
+    <string name="login_link">Log in</string>
 </resources>

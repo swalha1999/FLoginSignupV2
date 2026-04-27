@@ -10,11 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class SignupFragment extends Fragment {
     private EditText etEmail, etPassword;
     private Button btnSignup;
+    private TextView tvLoginLink;
     private FirebaseServices fbs;
 
     public SignupFragment() {
@@ -33,6 +35,13 @@ public class SignupFragment extends Fragment {
         etEmail = view.findViewById(R.id.etUsernameSignup);
         etPassword = view.findViewById(R.id.etPasswordSignup);
         btnSignup = view.findViewById(R.id.btnSignup);
+        tvLoginLink = view.findViewById(R.id.tvLoginLinkSignup);
+
+        tvLoginLink.setOnClickListener(v -> {
+            if (getActivity() != null) {
+                getActivity().getSupportFragmentManager().popBackStack();
+            }
+        });
 
         btnSignup.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
