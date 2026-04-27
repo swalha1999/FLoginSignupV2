@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,14 +53,18 @@ public class SignupFragment extends Fragment {
             }
 
             fbs.getAuth().createUserWithEmailAndPassword(email, password)
-                    .addOnSuccessListener(authResult -> {
-                        Toast.makeText(getActivity(), "Account created — please log in", Toast.LENGTH_SHORT).show();
-                        if (getActivity() != null) {
-                            getActivity().getSupportFragmentManager().popBackStack();
-                        }
-                    })
+                    .addOnSuccessListener(authResult -> gotoWelcomeFragment())
                     .addOnFailureListener(e ->
                             Toast.makeText(getActivity(), "Signup failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
         });
+    }
+
+    private void gotoWelcomeFragment() {
+        if (getActivity() == null) return;
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        fm.beginTransaction()
+                .replace(R.id.frameLayoutMain, new WelcomeFragment())
+                .commit();
     }
 }

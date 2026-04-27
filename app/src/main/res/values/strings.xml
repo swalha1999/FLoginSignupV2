@@ -20,4 +20,8 @@
     <string name="signup_link">Sign up</string>
     <string name="have_account_prompt">Already have an account?</string>
     <string name="login_link">Log in</string>
+
+    <string name="welcome_title">You\'re in!</string>
+    <string name="welcome_subtitle">Signed in as %1$s</string>
+    <string name="logout_button">Log out</string>
 </resources>

@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
@@ -52,8 +53,7 @@ public class LoginFragment extends Fragment {
             }
 
             fbs.getAuth().signInWithEmailAndPassword(email, password)
-                    .addOnSuccessListener(authResult ->
-                            Toast.makeText(getActivity(), "Welcome, " + email, Toast.LENGTH_SHORT).show())
+                    .addOnSuccessListener(authResult -> gotoWelcomeFragment())
                     .addOnFailureListener(e ->
                             Toast.makeText(getActivity(), "Login failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
         });
@@ -71,5 +71,14 @@ public class LoginFragment extends Fragment {
         ft.replace(R.id.frameLayoutMain, new ForgotPasswordFragment());
         ft.addToBackStack(null);
         ft.commit();
+    }
+
+    private void gotoWelcomeFragment() {
+        if (getActivity() == null) return;
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        fm.beginTransaction()
+                .replace(R.id.frameLayoutMain, new WelcomeFragment())
+                .commit();
     }
 }

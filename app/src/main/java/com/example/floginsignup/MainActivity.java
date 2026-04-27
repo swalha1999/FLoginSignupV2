@@ -17,8 +17,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        gotoLoginFragment();
-
+        showInitialFragment();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -26,12 +25,12 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
     }
-    private void gotoLoginFragment() {
+
+    private void showInitialFragment() {
+        boolean signedIn = FirebaseServices.getInstance().getAuth().getCurrentUser() != null;
+        Fragment initial = signedIn ? new WelcomeFragment() : new LoginFragment();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.frameLayoutMain,new LoginFragment());
+        ft.replace(R.id.frameLayoutMain, initial);
         ft.commit();
-
     }
-
-
 }
