@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -14,11 +16,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.floginsignup.R;
 import com.example.floginsignup.api.ApiCallback;
 import com.example.floginsignup.api.ApiClient;
+import com.example.floginsignup.api.ParkingApi;
 import com.example.floginsignup.model.ParkingRow;
 import com.example.floginsignup.model.ParkingSpot;
 import com.example.floginsignup.model.ParkingState;
@@ -30,6 +34,16 @@ public class ParkingFragment extends Fragment {
     private TextView tvOccPercent, tvDonutOccupied, tvDonutAvailable, tvDonutReserved;
     private LinearLayout rowAContainer, rowBContainer;
     private DonutChartView donut;
+
+    private LinearLayout gateChipContainer;
+    private ImageView ivGateChipIcon;
+    private TextView tvGateChip, tvGateStatus;
+
+    private LinearLayout btnGate;
+    private TextView tvBtnGate;
+    private final Handler gateHandler = new Handler(Looper.getMainLooper());
+    private Runnable gateTick;
+    private boolean gateBusy = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -52,14 +66,110 @@ public class ParkingFragment extends Fragment {
         rowBContainer = v.findViewById(R.id.rowBContainer);
         donut = v.findViewById(R.id.donut);
 
+        gateChipContainer = v.findViewById(R.id.gateChipContainer);
+        ivGateChipIcon = v.findViewById(R.id.ivGateChipIcon);
+        tvGateChip = v.findViewById(R.id.tvGateChip);
+        tvGateStatus = v.findViewById(R.id.tvGateStatus);
+
+        btnGate = v.findViewById(R.id.btnGate);
+        tvBtnGate = v.findViewById(R.id.tvBtnGate);
+        btnGate.setOnClickListener(view -> onGateClicked());
+
         ApiClient.get().getParkingState(new ApiCallback<ParkingState>() {
             @Override public void onSuccess(ParkingState data) { bind(data); }
             @Override public void onError(Throwable e) { /* show empty */ }
         });
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        gateHandler.removeCallbacksAndMessages(null);
+    }
+
+    private void onGateClicked() {
+        if (gateBusy) return;
+        gateBusy = true;
+        btnGate.setEnabled(false);
+
+        ApiClient.get().openGate(new ParkingApi.GateCallback() {
+            @Override
+            public void onOpened() {
+                if (!isAdded()) return;
+                applyGateState(true);
+                startGateCountdown();
+            }
+
+            @Override
+            public void onClosed() {
+                if (!isAdded()) return;
+                applyGateState(false);
+                resetGateButton();
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                if (!isAdded()) return;
+                resetGateButton();
+            }
+        });
+    }
+
+    private void applyGateState(boolean open) {
+        Context ctx = requireContext();
+        if (open) {
+            gateChipContainer.setBackgroundResource(R.drawable.bg_chip_green);
+            int green = ContextCompat.getColor(ctx, R.color.brand_green);
+            ivGateChipIcon.setColorFilter(green, PorterDuff.Mode.SRC_IN);
+            tvGateChip.setText(R.string.gate_open);
+            tvGateChip.setTextColor(green);
+            tvGateStatus.setText(R.string.gate_status_open);
+        } else {
+            gateChipContainer.setBackgroundResource(R.drawable.bg_chip_red);
+            int red = ContextCompat.getColor(ctx, R.color.brand_red);
+            ivGateChipIcon.setColorFilter(red, PorterDuff.Mode.SRC_IN);
+            tvGateChip.setText(R.string.gate_closed_chip);
+            tvGateChip.setTextColor(red);
+            tvGateStatus.setText(R.string.gate_closed);
+        }
+    }
+
+    private void startGateCountdown() {
+        btnGate.setBackgroundResource(R.drawable.bg_btn_gate_red);
+        btnGate.setEnabled(false);
+        final int totalSeconds = (int) (ParkingApi.GATE_OPEN_DURATION_MS / 1000L);
+        tvBtnGate.setText(getString(R.string.gate_open_countdown, totalSeconds));
+
+        gateTick = new Runnable() {
+            int remaining = totalSeconds;
+
+            @Override
+            public void run() {
+                if (!isAdded()) return;
+                remaining--;
+                if (remaining <= 0) {
+                    tvBtnGate.setText(getString(R.string.gate_open_countdown, 0));
+                    return;
+                }
+                tvBtnGate.setText(getString(R.string.gate_open_countdown, remaining));
+                gateHandler.postDelayed(this, 1000L);
+            }
+        };
+        gateHandler.postDelayed(gateTick, 1000L);
+    }
+
+    private void resetGateButton() {
+        gateHandler.removeCallbacksAndMessages(null);
+        gateTick = null;
+        gateBusy = false;
+        btnGate.setBackgroundResource(R.drawable.bg_btn_gate_green);
+        btnGate.setEnabled(true);
+        tvBtnGate.setText(R.string.open_gate);
+    }
+
     private void bind(ParkingState s) {
         if (!isAdded()) return;
+        applyGateState(s.gateOpen);
         tvEntry.setText(getString(R.string.entry_count, s.entryCount));
         tvExit.setText(getString(R.string.exit_count, s.exitCount));
 

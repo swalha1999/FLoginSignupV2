@@ -42,6 +42,8 @@
     <!-- Parking -->
     <string name="parking_title">Parking Spots</string>
     <string name="gate_open">Gate Open</string>
+    <string name="gate_closed_chip">Gate Closed</string>
+    <string name="gate_status_open">Gate: Open</string>
     <string name="entry_count">Entry: %1$d</string>
     <string name="exit_count">Exit: %1$d</string>
     <string name="driving_lane">DRIVING LANE</string>
@@ -53,6 +55,8 @@
     <string name="occupancy_legend_occupied">Occupied · %1$d</string>
     <string name="occupancy_legend_available">Available · %1$d</string>
     <string name="occupancy_legend_reserved">Reserved · %1$d</string>
+    <string name="open_gate">Open Gate</string>
+    <string name="gate_open_countdown">Open · %1$ds</string>
 
     <!-- Activity -->
     <string name="activity_title">Activity Log</string>

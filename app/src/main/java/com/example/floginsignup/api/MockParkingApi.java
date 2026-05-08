@@ -34,6 +34,14 @@ public class MockParkingApi implements ParkingApi {
         handler.postDelayed(() -> cb.onSuccess(buildActivityLog()), FAKE_LATENCY_MS);
     }
 
+    @Override
+    public void openGate(GateCallback cb) {
+        handler.postDelayed(() -> {
+            cb.onOpened();
+            handler.postDelayed(cb::onClosed, GATE_OPEN_DURATION_MS);
+        }, FAKE_LATENCY_MS);
+    }
+
     private DashboardData buildDashboard() {
         return new DashboardData(20, 14, 4, 2, 2840.0, buildActivityLog().subList(0, 3));
     }
