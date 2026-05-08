@@ -20,6 +20,7 @@ public class MockParkingApi implements ParkingApi {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final List<ActivityItem> activityLog = seedActivityLog();
     private long activityIdCounter = activityLog.size();
+    private long gateOpenUntilMs = 0L;
 
     @Override
     public void getDashboard(ApiCallback<DashboardData> cb) {
@@ -39,10 +40,18 @@ public class MockParkingApi implements ParkingApi {
     @Override
     public void openGate(GateCallback cb) {
         handler.postDelayed(() -> {
+            gateOpenUntilMs = System.currentTimeMillis() + GATE_OPEN_DURATION_MS;
             recordGateOpened();
             cb.onOpened();
-            handler.postDelayed(cb::onClosed, GATE_OPEN_DURATION_MS);
+            handler.postDelayed(() -> {
+                gateOpenUntilMs = 0L;
+                cb.onClosed();
+            }, GATE_OPEN_DURATION_MS);
         }, FAKE_LATENCY_MS);
+    }
+
+    private long gateRemainingMs() {
+        return Math.max(0L, gateOpenUntilMs - System.currentTimeMillis());
     }
 
     private void recordGateOpened() {
@@ -79,7 +88,8 @@ public class MockParkingApi implements ParkingApi {
                 new ParkingRow("ROW A", rowA),
                 new ParkingRow("ROW B", rowB)
         );
-        return new ParkingState(false, 8, 5, rows, 14, 4, 2);
+        long remaining = gateRemainingMs();
+        return new ParkingState(remaining > 0, remaining, 8, 5, rows, 14, 4, 2);
     }
 
     private List<ActivityItem> seedActivityLog() {

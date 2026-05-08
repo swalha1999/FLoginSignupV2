@@ -97,12 +97,13 @@ public class ParkingFragment extends Fragment {
             public void onOpened() {
                 if (!isAdded()) return;
                 applyGateState(true);
-                startGateCountdown();
+                startGateCountdown(ParkingApi.GATE_OPEN_DURATION_MS);
             }
 
             @Override
             public void onClosed() {
                 if (!isAdded()) return;
+                if (!gateBusy) return;
                 applyGateState(false);
                 resetGateButton();
             }
@@ -134,10 +135,12 @@ public class ParkingFragment extends Fragment {
         }
     }
 
-    private void startGateCountdown() {
+    private void startGateCountdown(long remainingMs) {
+        gateBusy = true;
+        gateHandler.removeCallbacksAndMessages(null);
         btnGate.setBackgroundResource(R.drawable.bg_btn_gate_red);
         btnGate.setEnabled(false);
-        final int totalSeconds = (int) (ParkingApi.GATE_OPEN_DURATION_MS / 1000L);
+        final int totalSeconds = (int) Math.ceil(remainingMs / 1000.0);
         tvBtnGate.setText(getString(R.string.gate_open_countdown, totalSeconds));
 
         gateTick = new Runnable() {
@@ -148,7 +151,8 @@ public class ParkingFragment extends Fragment {
                 if (!isAdded()) return;
                 remaining--;
                 if (remaining <= 0) {
-                    tvBtnGate.setText(getString(R.string.gate_open_countdown, 0));
+                    applyGateState(false);
+                    resetGateButton();
                     return;
                 }
                 tvBtnGate.setText(getString(R.string.gate_open_countdown, remaining));
@@ -170,6 +174,9 @@ public class ParkingFragment extends Fragment {
     private void bind(ParkingState s) {
         if (!isAdded()) return;
         applyGateState(s.gateOpen);
+        if (s.gateOpen && s.gateRemainingMs > 0L && !gateBusy) {
+            startGateCountdown(s.gateRemainingMs);
+        }
         tvEntry.setText(getString(R.string.entry_count, s.entryCount));
         tvExit.setText(getString(R.string.exit_count, s.exitCount));
 

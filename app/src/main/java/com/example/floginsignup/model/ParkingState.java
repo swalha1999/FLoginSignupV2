@@ -4,6 +4,7 @@ import java.util.List;
 
 public class ParkingState {
     public final boolean gateOpen;
+    public final long gateRemainingMs;
     public final int entryCount;
     public final int exitCount;
     public final List<ParkingRow> rows;
@@ -11,9 +12,10 @@ public class ParkingState {
     public final int available;
     public final int reserved;
 
-    public ParkingState(boolean gateOpen, int entryCount, int exitCount,
+    public ParkingState(boolean gateOpen, long gateRemainingMs, int entryCount, int exitCount,
                         List<ParkingRow> rows, int occupied, int available, int reserved) {
         this.gateOpen = gateOpen;
+        this.gateRemainingMs = gateRemainingMs;
         this.entryCount = entryCount;
         this.exitCount = exitCount;
         this.rows = rows;
