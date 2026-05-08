@@ -18,6 +18,8 @@ public class MockParkingApi implements ParkingApi {
 
     private static final long FAKE_LATENCY_MS = 250;
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private final List<ActivityItem> activityLog = seedActivityLog();
+    private long activityIdCounter = activityLog.size();
 
     @Override
     public void getDashboard(ApiCallback<DashboardData> cb) {
@@ -31,19 +33,31 @@ public class MockParkingApi implements ParkingApi {
 
     @Override
     public void getActivityLog(ApiCallback<List<ActivityItem>> cb) {
-        handler.postDelayed(() -> cb.onSuccess(buildActivityLog()), FAKE_LATENCY_MS);
+        handler.postDelayed(() -> cb.onSuccess(new ArrayList<>(activityLog)), FAKE_LATENCY_MS);
     }
 
     @Override
     public void openGate(GateCallback cb) {
         handler.postDelayed(() -> {
+            recordGateOpened();
             cb.onOpened();
             handler.postDelayed(cb::onClosed, GATE_OPEN_DURATION_MS);
         }, FAKE_LATENCY_MS);
     }
 
+    private void recordGateOpened() {
+        activityIdCounter++;
+        activityLog.add(0, new ActivityItem(
+                String.valueOf(activityIdCounter),
+                ActivityItem.Type.GATE_OPENED,
+                "Gate opened manually",
+                "Admin",
+                System.currentTimeMillis()));
+    }
+
     private DashboardData buildDashboard() {
-        return new DashboardData(20, 14, 4, 2, 2840.0, buildActivityLog().subList(0, 3));
+        List<ActivityItem> recent = new ArrayList<>(activityLog.subList(0, Math.min(3, activityLog.size())));
+        return new DashboardData(20, 14, 4, 2, 2840.0, recent);
     }
 
     private ParkingState buildParkingState() {
@@ -68,7 +82,7 @@ public class MockParkingApi implements ParkingApi {
         return new ParkingState(false, 8, 5, rows, 14, 4, 2);
     }
 
-    private List<ActivityItem> buildActivityLog() {
+    private List<ActivityItem> seedActivityLog() {
         long now = System.currentTimeMillis();
         List<ActivityItem> list = new ArrayList<>();
         list.add(new ActivityItem("1", ActivityItem.Type.CAR_ENTERED,
