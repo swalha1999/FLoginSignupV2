@@ -198,8 +198,12 @@
                     android:textAppearance="@style/SectionTitle" />
 
                 <TextView
+                    android:id="@+id/tvViewAllParking"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:padding="4dp"
                     android:text="@string/view_all"
                     android:textColor="@color/brand_blue"
@@ -314,8 +318,12 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvViewAllActivity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:padding="4dp"
                     android:text="@string/view_all"
                     android:textColor="@color/brand_blue"

@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.floginsignup.HomeActivity;
 import com.example.floginsignup.R;
 import com.example.floginsignup.api.ApiCallback;
 import com.example.floginsignup.api.ApiClient;
@@ -52,8 +53,17 @@ public class DashboardFragment extends Fragment {
         stackedBar = view.findViewById(R.id.stackedBar);
         recentActivityContainer = view.findViewById(R.id.recentActivityContainer);
 
+        view.findViewById(R.id.tvViewAllParking).setOnClickListener(v -> openTab(1));
+        view.findViewById(R.id.tvViewAllActivity).setOnClickListener(v -> openTab(2));
+
         tvGreeting.setText(greetingForTime());
         loadData();
+    }
+
+    private void openTab(int index) {
+        if (getActivity() instanceof HomeActivity) {
+            ((HomeActivity) getActivity()).selectTab(index);
+        }
     }
 
     private void loadData() {
