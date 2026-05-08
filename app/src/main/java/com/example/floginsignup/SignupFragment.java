@@ -1,10 +1,10 @@
 package com.example.floginsignup;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,18 +53,16 @@ public class SignupFragment extends Fragment {
             }
 
             fbs.getAuth().createUserWithEmailAndPassword(email, password)
-                    .addOnSuccessListener(authResult -> gotoWelcomeFragment())
+                    .addOnSuccessListener(authResult -> gotoHome())
                     .addOnFailureListener(e ->
                             Toast.makeText(getActivity(), "Signup failed: " + e.getMessage(), Toast.LENGTH_LONG).show());
         });
     }
 
-    private void gotoWelcomeFragment() {
+    private void gotoHome() {
         if (getActivity() == null) return;
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        fm.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        fm.beginTransaction()
-                .replace(R.id.frameLayoutMain, new WelcomeFragment())
-                .commit();
+        Intent i = new Intent(getActivity(), HomeActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
     }
 }
